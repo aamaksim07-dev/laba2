@@ -1,70 +1,52 @@
 ﻿#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <locale.h>
-#include <windows.h>
 
-#define MAXN 10000		// максимальный размер матрицы
-
-/* Матрицы объявлены глобально: три массива 10000 x 10000
-   занимают около 1,2 ГБ, на стеке столько места нет. */
-int a[MAXN][MAXN], b[MAXN][MAXN], c[MAXN][MAXN];
-
-void matrix_multiplication(int n)
+int main(void)
 {
-	clock_t start, end;
-	int i=0, j=0, r;
-	int elem_c;
+	setvbuf(stdin, NULL, _IONBF, 0);
+	setvbuf(stdout, NULL, _IONBF, 0);
 
-	srand((unsigned)time(NULL));
-	while(i<n)
+	clock_t start, end; // объявляем переменные для определения времени выполнения
+
+	int i = 0, j = 0, r;
+	int a[200][200], b[200][200], c[200][200], elem_c;
+
+	srand(time(NULL)); // инициализируем параметры генератора случайных чисел
+	while (i < 200)
 	{
-		j=0;	// без сброса j заполнялась бы только первая строка
-		while(j<n)
+		while (j < 200)
 		{
-			a[i][j]=rand()% 100 + 1;	// заполняем матрицы случайными числами
-			b[i][j]=rand()% 100 + 1;
-			c[i][j]=0;
+			a[i][j] = rand() % 100 + 1; // заполняем массив случайными числами
+			j++;
+		}
+		i++;
+	}
+	srand(time(NULL)); // инициализируем параметры генератора случайных чисел
+	i = 0; j = 0;
+	while (i < 200)
+	{
+		while (j < 200)
+		{
+			b[i][j] = rand() % 100 + 1; // заполняем массив случайными числами
 			j++;
 		}
 		i++;
 	}
 
-	start = clock();
-
-	/* Порядок циклов i-r-j: элементы b и c перебираются
-	   по строкам, подряд. При обычном порядке i-j-r матрица b
-	   читается по столбцам, и программа работает дольше. */
-	for(i=0;i<n;i++)
+	for (i = 0; i < 200; i++)
 	{
-		for(r=0;r<n;r++)
+		for (j = 0; j < 200; j++)
 		{
-			elem_c=a[i][r];
-			for(j=0;j<n;j++)
-				c[i][j]=c[i][j]+elem_c*b[r][j];
+			elem_c = 0;
+			for (r = 0; r < 200; r++)
+			{
+				elem_c = elem_c + a[i][r] * b[r][j];
+				c[i][j] = elem_c;
+			}
 		}
 	}
 
-	end = clock();
 
-	printf("%d\t%f сек.\n", n, (double)(end-start)/CLOCKS_PER_SEC);
-}
-
-int main(void)
-{
-	int sizes[] = { 100, 200, 400, 1000, 2000, 4000, 10000 };
-	int count = sizeof(sizes) / sizeof(sizes[0]);
-	int k;
-
-	setvbuf(stdin, NULL, _IONBF, 0);
-	setvbuf(stdout, NULL, _IONBF, 0);
-	SetConsoleOutputCP(1251);		// вывод по-русски
-	setlocale(LC_NUMERIC, "Russian");	// запятая в дробях
-
-	printf("Размер\tВремя\n");
-
-	for(k=0; k<count; k++)
-		matrix_multiplication(sizes[k]);
-
-	return 0;
+	return(0);
 }
